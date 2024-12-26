@@ -7,6 +7,12 @@ export * from "./actions/cdp/defi/wow";
 // Export Twitter actions
 export * from "./actions/cdp/social/twitter";
 
+// Export Flippando actions
+export * from "./actions/cdp/flippando";
+
+// Export Flippando Action
+export { FlippandoAction } from "./actions/cdp/flippando/flippando_action";
+
 // Export CDP Action
 export { CdpAction } from "./actions/cdp/cdp_action";
 
