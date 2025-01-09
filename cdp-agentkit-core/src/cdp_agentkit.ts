@@ -1,4 +1,4 @@
-import { Wallet, WalletData, Coinbase } from "@coinbase/coinbase-sdk";
+import { Coinbase, MnemonicSeedPhrase, Wallet, WalletData } from "@coinbase/coinbase-sdk";
 import { version } from "../package.json";
 import { CdpAction, CdpActionSchemaAny } from "./actions/cdp/cdp_action";
 import { z } from "zod";
@@ -16,13 +16,10 @@ interface CdpAgentkitOptions {
 /**
  * Configuration options for the CDP Agentkit with a Wallet.
  */
-interface ConfigureCdpAgentkitWithWalletOptions {
-  cdpApiKeyName?: string;
-  cdpApiKeyPrivateKey?: string;
-  source?: string;
-  sourceVersion?: string;
+interface ConfigureCdpAgentkitWithWalletOptions extends CdpAgentkitOptions {
   networkId?: string;
   cdpWalletData?: string;
+  mnemonicPhrase?: string;
 }
 
 /**
@@ -70,12 +67,16 @@ export class CdpAgentkit {
   ): Promise<CdpAgentkit> {
     const agentkit = new CdpAgentkit(config);
 
+    const mnemonicPhrase = config.mnemonicPhrase || process.env.MNEMONIC_PHRASE;
     const networkId = config.networkId || process.env.NETWORK_ID || Coinbase.networks.BaseSepolia;
 
     try {
       if (config.cdpWalletData) {
         const walletData = JSON.parse(config.cdpWalletData) as WalletData;
         agentkit.wallet = await Wallet.import(walletData);
+      } else if (mnemonicPhrase) {
+        agentkit.wallet = await Wallet.import({ mnemonicPhrase: mnemonicPhrase });
+        console.log(agentkit.wallet);
       } else {
         agentkit.wallet = await Wallet.create({ networkId: networkId });
       }
